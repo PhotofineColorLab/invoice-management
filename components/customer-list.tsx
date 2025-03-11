@@ -1,55 +1,93 @@
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import type { Customer } from "@/app/types/data-types";
+"use client"
 
-interface CustomerListProps {
-    customers: Customer[]
-}
+import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { PencilIcon, TrashIcon } from "lucide-react"
+import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks"
+import { deleteCustomer } from "@/lib/redux/slices/customersSlice"
+import { CustomerEditDialog } from "./edit-dialogs/customer-edit-dialog"
+import type { Customer } from "@/app/types/data-types"
 
-export function CustomerList({ customers }: CustomerListProps) {
-    if (customers.length === 0) {
-        return (
-            <Card>
-                <CardContent className="p-6 text-center">
-                    <p className="text-muted-foreground">No customers found</p>
-                </CardContent>
-            </Card>
-        )
-    }
+export function CustomerList() {
+  const customers = useAppSelector((state) => state.customers.items)
+  const dispatch = useAppDispatch()
 
+  const [editingCustomer, setEditingCustomer] = useState<{ index: number; customer: Customer } | null>(null)
+
+  const handleEdit = (index: number, customer: Customer) => {
+    setEditingCustomer({ index, customer })
+  }
+
+  const handleDelete = (index: number) => {
+    dispatch(deleteCustomer(index))
+  }
+
+  if (customers.length === 0) {
     return (
-        <div className="space-y-4">
-            {customers.map((customer, index) => (
-                <Card key={index}>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-xl">{customer.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Email</p>
-                                <p className="font-medium">{customer.email || "N/A"}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Phone</p>
-                                <p className="font-medium">{customer.phone || "N/A"}</p>
-                            </div>
-                            {customer.address && (
-                                <div className="md:col-span-2">
-                                    <p className="text-sm text-muted-foreground">Address</p>
-                                    <p className="font-medium">{customer.address}</p>
-                                </div>
-                            )}
-                            {customer.id && (
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Customer ID</p>
-                                    <p className="font-medium">{customer.id}</p>
-                                </div>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
-        </div>
+      <Card>
+        <CardContent className="p-6 text-center">
+          <p className="text-muted-foreground">No customers found</p>
+        </CardContent>
+      </Card>
     )
+  }
+
+  return (
+    <>
+      <div className="space-y-4">
+        {customers.map((customer, index) => (
+          <Card key={index}>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-xl">{customer.name}</CardTitle>
+                <div className="flex items-center space-x-2">
+                  <Button variant="ghost" size="icon" onClick={() => handleEdit(index, customer)}>
+                    <PencilIcon className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(index)}>
+                    <TrashIcon className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium">{customer.email || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Phone</p>
+                  <p className="font-medium">{customer.phone || "N/A"}</p>
+                </div>
+                {customer.address && (
+                  <div className="md:col-span-2">
+                    <p className="text-sm text-muted-foreground">Address</p>
+                    <p className="font-medium">{customer.address}</p>
+                  </div>
+                )}
+                {customer.id && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Customer ID</p>
+                    <p className="font-medium">{customer.id}</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {editingCustomer && (
+        <CustomerEditDialog
+          customer={editingCustomer.customer}
+          index={editingCustomer.index}
+          open={!!editingCustomer}
+          onClose={() => setEditingCustomer(null)}
+        />
+      )}
+    </>
+  )
 }
 

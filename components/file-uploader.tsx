@@ -6,7 +6,7 @@ import { Button } from "./ui/button"
 import { Card, CardContent } from "./ui/card"
 import { UploadIcon, FileIcon, XIcon } from "lucide-react"
 import { processFile } from "@/lib/process-file"
-import { toast } from "sonner" // Correct import for Sonner
+import { toast } from "sonner" 
 import type { CategoryData } from "@/app/types/data-types"
 
 interface FileUploaderProps {
