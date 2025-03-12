@@ -31,7 +31,7 @@ export function CustomerList() {
     try {
       exportToPdf("customer", customer, index)
       toast("PDF Export Successful")
-    } catch (error) {
+    } catch {
       toast("An unknown error occurred")
     }
   }
@@ -40,7 +40,7 @@ export function CustomerList() {
     try {
       exportToPdf("customers", customers)
       toast("All customers have been exported as PDF.")
-    } catch (error) {
+    } catch {
       toast("An unknown error occurred")
     }
   }
@@ -136,4 +136,3 @@ export function CustomerList() {
     </>
   )
 }
-

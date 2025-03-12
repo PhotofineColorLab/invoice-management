@@ -19,6 +19,13 @@ import { useMobile } from "@/hooks/use-mobile"
 import { toast } from "sonner"
 import type { CategoryData } from "@/app/types/data-types"
 
+interface ValidationResult {
+  category: "invoice" | "product" | "customer"
+  itemIndex: number
+  itemName: string
+  fixedFields: string[]
+}
+
 export function Dashboard() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isValidating, setIsValidating] = useState(false)
@@ -26,7 +33,7 @@ export function Dashboard() {
   const [activeTab, setActiveTab] = useState("invoices")
   const [hasError, setHasError] = useState(false)
   const [validationProgress, setValidationProgress] = useState<string>("")
-  const [validationResults, setValidationResults] = useState<any[]>([])
+  const [validationResults, setValidationResults] = useState<ValidationResult[]>([])
   const [showValidationResults, setShowValidationResults] = useState(false)
 
   const isMobile = useMobile()
@@ -146,8 +153,8 @@ export function Dashboard() {
       products: typeof currentProducts
       customers: typeof currentCustomers
     },
-  ): any[] => {
-    const results: any[] = []
+  ): ValidationResult[] => {
+    const results: ValidationResult[] = []
 
     // Compare invoices
     before.invoices.forEach((invoice, index) => {
@@ -314,4 +321,3 @@ export function Dashboard() {
     </div>
   )
 }
-

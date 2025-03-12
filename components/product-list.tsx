@@ -33,6 +33,7 @@ export function ProductList() {
       exportToPdf("product", product, index)
       toast("Product has been exported as PDF.")
     } catch (error) {
+      console.log("Error exporting Products", error)
       toast("An unknown error occurred")
     }
   }
@@ -42,6 +43,7 @@ export function ProductList() {
       exportToPdf("products", products)
       toast("All products have been exported as PDF.")
     } catch (error) {
+      console.error("Error exporting all the products", error)
       toast("An unknown error occurred")
     }
   }

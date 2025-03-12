@@ -143,7 +143,7 @@ export async function processFile(file: File): Promise<CategoryData> {
       jsonData = JSON.parse(text) as CategoryData
     } catch (error) {
       // If direct parsing fails, try to extract JSON from the text
-      console.log("Direct parsing failed, attempting to extract JSON from text")
+      console.log("Direct parsing failed, attempting to extract JSON from text", error)
 
       // Look for JSON object pattern
       const jsonMatch = text.match(/\{[\s\S]*\}/)

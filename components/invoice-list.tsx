@@ -34,6 +34,7 @@ export function InvoiceList() {
       exportToPdf("invoice", invoice, index)
       toast("Invoice has been exported as PDF.")
     } catch (error) {
+      console.error("Error exporting invoice:", error)
       toast("An unknown error occurred")
     }
   }
@@ -43,6 +44,7 @@ export function InvoiceList() {
       exportToPdf("invoices", invoices)
       toast("All invoices have been exported as PDF.")
     } catch (error) {
+      console.error("Error exporting all invoices:", error)
       toast("An unknown error occurred")
     }
   }
