@@ -1,12 +1,13 @@
 "use client"
 
 import type React from "react"
+
 import { useState, useRef } from "react"
-import { Button } from "./ui/button"
-import { Card, CardContent } from "./ui/card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { UploadIcon, FileIcon, XIcon } from "lucide-react"
+import { toast } from "sonner"
 import { processFile } from "@/lib/process-file"
-import { toast } from "sonner" 
 import type { CategoryData } from "@/app/types/data-types"
 
 interface FileUploaderProps {
@@ -15,11 +16,7 @@ interface FileUploaderProps {
   onProcessingError: () => void
 }
 
-export function FileUploader({
-  onProcessingStart,
-  onProcessingComplete,
-  onProcessingError,
-}: FileUploaderProps) {
+export function FileUploader({ onProcessingStart, onProcessingComplete, onProcessingError }: FileUploaderProps) {
   const [file, setFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -31,9 +28,17 @@ export function FileUploader({
   }
 
   const validateAndSetFile = (file: File) => {
-    const validTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"]
+    const validTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // Excel (.xlsx)
+      "application/vnd.ms-excel", // Older Excel format
+    ]
+
     if (!validTypes.includes(file.type)) {
-      toast.error("Invalid file type. Please upload a PDF, JPG, or PNG file.") // Using Sonner toast error
+      toast.error("Invalid file type. Please upload a PDF, JPG, PNG, or Excel (.xlsx) file.")
       return
     }
     setFile(file)
@@ -75,16 +80,24 @@ export function FileUploader({
       const isEmpty = result.invoices.length === 0 && result.products.length === 0 && result.customers.length === 0
 
       if (isEmpty) {
-        toast.error("No data extracted. The AI couldn't extract structured data from this document.") // Using Sonner toast error
+        toast.error("No data extracted. The AI couldn't extract structured data from this document.")
         onProcessingError()
       } else {
         onProcessingComplete(result)
-        toast.success("Processing complete. Your file has been successfully analyzed.") // Using Sonner toast success
+        toast.success("Processing complete. Your file has been successfully analyzed.")
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An unknown error occurred") // Using Sonner toast error
+      toast.error(error instanceof Error ? error.message : "An unknown error occurred")
       onProcessingError()
     }
+  }
+
+  // Get file type for display
+  const getFileType = (file: File) => {
+    if (file.type.includes("pdf")) return "PDF"
+    if (file.type.includes("image")) return "Image"
+    if (file.type.includes("spreadsheet") || file.type.includes("excel")) return "Excel"
+    return "File"
   }
 
   return (
@@ -105,7 +118,7 @@ export function FileUploader({
               </div>
               <div>
                 <p className="text-lg font-medium">Drag and drop your file here</p>
-                <p className="text-sm text-muted-foreground mt-1">Supports PDF, JPG, and PNG files</p>
+                <p className="text-sm text-muted-foreground mt-1">Supports PDF, JPG, PNG, and Excel (.xlsx) files</p>
               </div>
               <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="mt-2">
                 Browse Files
@@ -114,7 +127,7 @@ export function FileUploader({
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
-                accept=".pdf,.jpg,.jpeg,.png"
+                accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls"
                 className="hidden"
               />
             </div>
@@ -123,6 +136,7 @@ export function FileUploader({
               <div className="flex items-center justify-center space-x-2">
                 <FileIcon className="h-6 w-6 text-primary" />
                 <span className="font-medium">{file.name}</span>
+                <span className="text-xs text-muted-foreground">({getFileType(file)})</span>
                 <Button variant="ghost" size="icon" onClick={handleRemoveFile} className="h-6 w-6 rounded-full">
                   <XIcon className="h-4 w-4" />
                 </Button>
